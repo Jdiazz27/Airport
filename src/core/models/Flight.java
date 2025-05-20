@@ -2,8 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package airport;
+package core.models;
 
+import core.models.interfaces.CloneableModel;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -11,8 +12,8 @@ import java.util.ArrayList;
  *
  * @author edangulo
  */
-public class Flight {
-    
+public class Flight implements CloneableModel<Flight> {
+
     private final String id;
     private ArrayList<Passenger> passengers;
     private Plane plane;
@@ -24,7 +25,6 @@ public class Flight {
     private int minutesDurationArrival;
     private int hoursDurationScale;
     private int minutesDurationScale;
-    
 
     public Flight(String id, Plane plane, Location departureLocation, Location arrivalLocation, LocalDateTime departureDate, int hoursDurationArrival, int minutesDurationArrival) {
         this.id = id;
@@ -35,7 +35,7 @@ public class Flight {
         this.departureDate = departureDate;
         this.hoursDurationArrival = hoursDurationArrival;
         this.minutesDurationArrival = minutesDurationArrival;
-        
+
         this.plane.addFlight(this);
     }
 
@@ -51,14 +51,14 @@ public class Flight {
         this.minutesDurationArrival = minutesDurationArrival;
         this.hoursDurationScale = hoursDurationScale;
         this.minutesDurationScale = minutesDurationScale;
-        
+
         this.plane.addFlight(this);
     }
-    
+
     public void addPassenger(Passenger passenger) {
         this.passengers.add(passenger);
     }
-    
+
     public String getId() {
         return id;
     }
@@ -102,17 +102,42 @@ public class Flight {
     public void setDepartureDate(LocalDateTime departureDate) {
         this.departureDate = departureDate;
     }
-    
-    public LocalDateTime calculateArrivalDate() {
-        return departureDate.plusHours(hoursDurationScale).plusHours(hoursDurationArrival).plusMinutes(minutesDurationScale).plusMinutes(minutesDurationArrival);
+
+    @Override
+    public Flight clone() {
+        Flight copy;
+
+        // Verificamos si tiene escala
+        if (scaleLocation != null) {
+            copy = new Flight(
+                    this.id,
+                    this.plane,
+                    this.departureLocation,
+                    this.scaleLocation,
+                    this.arrivalLocation,
+                    this.departureDate,
+                    this.hoursDurationArrival,
+                    this.minutesDurationArrival,
+                    this.hoursDurationScale,
+                    this.minutesDurationScale
+            );
+        } else {
+            copy = new Flight(
+                    this.id,
+                    this.plane,
+                    this.departureLocation,
+                    this.arrivalLocation,
+                    this.departureDate,
+                    this.hoursDurationArrival,
+                    this.minutesDurationArrival
+            );
+        }
+
+        for (Passenger p : this.passengers) {
+            copy.addPassenger(p);
+        }
+
+        return copy;
     }
-    
-    public void delay(int hours, int minutes) {
-        this.departureDate = this.departureDate.plusHours(hours).plusMinutes(minutes);
-    }
-    
-    public int getNumPassengers() {
-        return passengers.size();
-    }
-    
+
 }

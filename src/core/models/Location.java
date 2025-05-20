@@ -2,14 +2,17 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package airport;
+package core.models;
+
+import core.models.interfaces.CloneableModel;
+
 
 /**
  *
  * @author edangulo
  */
-public class Location {
-    
+public class Location implements CloneableModel<Location> {
+
     private final String airportId;
     private String airportName;
     private String airportCity;
@@ -50,4 +53,15 @@ public class Location {
         return airportLongitude;
     }
     
+    @Override
+    public Location clone() {
+        return new Location(this.airportId,
+                this.airportName,
+                this.airportCity,
+                this.airportCountry,
+                this.airportLatitude,
+                this.airportLongitude
+        );
+    }
+
 }
