@@ -46,7 +46,7 @@ public class LocationController {
         
         boolean added = locationRepository.addLocation(location.clone());
         
-        if (added) {
+        if (added) {    
             return new Response(true, "Localizacion registrada correctamente", location.clone());
         } else {
             return new Response(false, "No se pudo registrar la localizacion", location.clone());

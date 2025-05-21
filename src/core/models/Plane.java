@@ -1,14 +1,14 @@
 package core.models;
 
 import core.models.Flight;
-import core.models.interfaces.CloneableModel;
 import java.util.ArrayList;
+import core.models.interfaces.Clone;
 
 /**
  *
  * @author edangulo
  */
-public class Plane implements CloneableModel<Plane> {
+public class Plane implements Clone<Plane> {
 
     private final String id;
     private String brand;

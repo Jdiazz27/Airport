@@ -4,15 +4,15 @@
  */
 package core.models;
 
-import core.models.interfaces.CloneableModel;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import core.models.interfaces.Clone;
 
 /**
  *
  * @author edangulo
  */
-public class Passenger implements CloneableModel<Passenger> {
+public class Passenger implements Clone<Passenger> {
 
     private final long id;
     private String firstname;

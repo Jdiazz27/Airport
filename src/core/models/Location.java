@@ -4,13 +4,13 @@
  */
 package core.models;
 
-import core.models.interfaces.CloneableModel;
+import core.models.interfaces.Clone;
 
 /**
  *
  * @author edangulo
  */
-public class Location implements CloneableModel<Location> {
+public class Location implements Clone<Location> {
 
     private final String airportId;
     private String airportName;
