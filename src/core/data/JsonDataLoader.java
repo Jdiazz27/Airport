@@ -19,7 +19,9 @@ import org.json.JSONTokener;
  * @author jdiaz
  */
 public class JsonDataLoader {
+
     private final AirportStorage storage = AirportStorage.getInstance();
+
     public void loadAllData() {
         loadLocations();
         loadPlanes();

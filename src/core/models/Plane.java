@@ -55,8 +55,9 @@ public class Plane implements CloneableModel<Plane> {
     }
 
     @Override
-    public plane clone() {
-        Plane copy = new Plane(this.id,
+    public Plane clone() {
+        Plane copy = new Plane(
+                this.id,
                 this.brand,
                 this.model,
                 this.maxCapacity,
@@ -64,7 +65,7 @@ public class Plane implements CloneableModel<Plane> {
         );
 
         for (Flight f : this.flights) {
-            copy.addFlight(f);
+            copy.addFlight(f); 
         }
 
         return copy;

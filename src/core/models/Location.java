@@ -6,7 +6,6 @@ package core.models;
 
 import core.models.interfaces.CloneableModel;
 
-
 /**
  *
  * @author edangulo
@@ -52,10 +51,11 @@ public class Location implements CloneableModel<Location> {
     public double getAirportLongitude() {
         return airportLongitude;
     }
-    
+
     @Override
     public Location clone() {
-        return new Location(this.airportId,
+        return new Location(
+                this.airportId,
                 this.airportName,
                 this.airportCity,
                 this.airportCountry,

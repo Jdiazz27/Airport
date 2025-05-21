@@ -9,14 +9,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-
 /**
  *
  * @author jdiaz
  */
 public class AirportStorage {
 
-    
     //metodo singleton
     private static AirportStorage instance;
     public static AirportStorage getInstance() {
@@ -25,39 +23,35 @@ public class AirportStorage {
         }
         return instance;
     }
-    
+
     private final PassengerRepository passengerRepo;
     private final PlaneRepository planeRepo;
-    private final FlightRepository planeRepo;
+    private final FlightRepository flightRepo;
     private final LocationRepository locationRepo;
 
     public AirportStorage() {
-        this.passengerRepo = passengerRepo;
-        this.planeRepo = planeRepo;
-        this.planeRepo = planeRepo;
-        this.locationRepo = locationRepo;
+        this.passengerRepo = new PassengerRepository();
+        this.planeRepo = new PlaneRepository();
+        this.flightRepo = new FlightRepository();
+        this.locationRepo = new LocationRepository();
+
     }
-    
-    
-    
-    public PassengerRepository getPassengerRepo(){  //metodos para entrar a los repositorios
+
+    // Métodos de acceso a los repositorios
+    public PassengerRepository getPassengerRepo() {
         return passengerRepo;
     }
-    
-    public PlaneRepository getPlaneRepo(){
+
+    public PlaneRepository getPlaneRepo() {
         return planeRepo;
     }
-    
-    public FlightRepository getFlightRepository(){
+
+    public FlightRepository getFlightRepository() {
         return flightRepo;
     }
-    
-    public locationRepository getLocationRepository(){
+
+    public LocationRepository getLocationRepository() {
         return locationRepo;
     }
-    
-    
-    
-    
 
 }

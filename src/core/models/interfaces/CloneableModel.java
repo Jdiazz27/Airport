@@ -9,6 +9,5 @@ package core.models.interfaces;
  * @author jdiaz
  */
 public interface CloneableModel<T> {
-
     T clone();
 }

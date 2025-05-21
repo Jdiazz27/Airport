@@ -1,4 +1,5 @@
 package core.models.storage;
+import core.models.Passenger;
 import core.models.Plane;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,60 +12,58 @@ import java.util.List;
  */
 public class PassengerRepository {
 
-    private List<Plane> planes = new ArrayList<>();
+    private List<Passenger> passengers = new ArrayList<>();
 
-    public boolean addPlane(Plane plane) {
-        for (Plane p : this.planes) {
-            if (p.getId() == plane.getId()) {
+    public boolean addPassenger(Passenger passenger) {
+        for (Passenger p : this.passengers) {
+            if (p.getId() == passenger.getId()) {
                 return false;
             }
         }
-        this.planes.add(plane);
+        this.passengers.add(passenger);
         return true;
     }
 
-    public Plane getPlane(String id) {
-        for (Plane p : planes) {
-            if (p.getId().equals(id)) {
+    public Passenger getPassenger(Long id) {
+        for (Passenger p : passengers) {
+            if (p.getId() == id) {
                 return p.clone();
             }
         }
         return null;
     }
 
-    public boolean delPlane(Long id) {
-        for (Plane p : this.planes) {
-            if (p.getId().equals(id)) {
-                this.planes.remove(p);
+    public boolean delPassenger(Long id) {
+        for (Passenger passenger : this.passengers) {
+            if (passenger.getId() == id) {
+                this.passengers.remove(passenger);
                 return true;
             }
         }
         return false;
     }
 
-    public List<Plane> getAllPlanes() {
-        List<Plane> sortedList = new ArrayList<>();
-
-        for (Plane p : planes) {
+    public List<Passenger> getAllPassengers() {
+        List<Passenger> sortedList = new ArrayList<>();
+        for (Passenger p : passengers) {
             sortedList.add(p.clone());
         }
-        Collections.sort(sortedList, new Comparator<Plane>() {
+        Collections.sort(sortedList, new Comparator<Passenger>() {
             @Override
-            public int compare(Plane p1, Plane p2) {
-                return p1.getId().compareTo(p2.getId());
+            public int compare(Passenger p1, Passenger p2) {
+                return Long.compare(p1.getId(), p2.getId());
             }
         });
 
         return sortedList;
     }
 
-    public Plane findById(String id) {
-        for (Plane p : planes) {
-            if (p.getId().equals(id)) {
+    public Passenger findById(long id) {
+        for (Passenger p : passengers) {
+            if (p.getId() == id) {
                 return p;
             }
         }
         return null;
     }
-
 }
