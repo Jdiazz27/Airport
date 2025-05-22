@@ -4,6 +4,7 @@
  */
 package core.models;
 
+import core.models.flight.Flight;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import core.models.interfaces.Clone;

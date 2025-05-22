@@ -4,7 +4,7 @@
  */
 package core.models.storage;
 
-import core.models.Flight;
+import core.models.flight.Flight;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;

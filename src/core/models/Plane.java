@@ -1,6 +1,6 @@
 package core.models;
 
-import core.models.Flight;
+import core.models.flight.Flight;
 import java.util.ArrayList;
 import core.models.interfaces.Clone;
 
