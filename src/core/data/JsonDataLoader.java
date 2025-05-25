@@ -29,7 +29,7 @@ public class JsonDataLoader {
 
     private void loadLocations() {
         try {
-            FileReader reader = new FileReader("C:/Users/jdiaz/OneDrive/Escritorio/III/POO/Airport/json/locations.json");
+            FileReader reader = new FileReader("json/locations.json");
             JSONArray array = new JSONArray(new JSONTokener(reader));
 
             for (int i = 0; i < array.length(); i++) {

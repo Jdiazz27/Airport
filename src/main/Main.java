@@ -19,7 +19,6 @@ import javax.swing.UIManager;
 public class Main {
 
     public static void main(String[] args) {
-        // Establecer estilo de interfaz
         System.setProperty("flatlaf.useNativeLibrary", "false");
         try {
             UIManager.setLookAndFeel(new FlatDarkLaf());

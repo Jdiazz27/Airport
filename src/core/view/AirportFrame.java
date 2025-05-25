@@ -25,9 +25,8 @@ import core.models.storage.PassengerRepository;
 import core.models.storage.PlaneRepository;
 import core.models.utils.FlightDelay;
 import core.models.utils.FlightTimeCalculator;
+import core.models.utils.PlaneCalculations;
 import java.awt.Color;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -54,6 +53,9 @@ public class AirportFrame extends javax.swing.JFrame {
     private PassengerController passengerController;
 
     JsonDataLoader loader = new JsonDataLoader();
+    FlightTimeCalculator calculator = new FlightTimeCalculator();
+    PlaneCalculations planeCalculator = new PlaneCalculations();
+    FlightDelay delayFlight = new FlightDelay();
 
     public AirportFrame() {
         initComponents();
@@ -90,29 +92,29 @@ public class AirportFrame extends javax.swing.JFrame {
 
         // Observadores de actualización de tablas
         TableRefresherObserver observerPassenger = new TableRefresherObserver(() -> {
-            PassengerTableList.updatePassengersList((DefaultTableModel) ShowAllPassengers.getModel()); // passengerTable → ShowAllPassengers ✅
+            PassengerTableList.updatePassengersList((DefaultTableModel) ShowAllPassengers.getModel()); 
         });
         passengerRP.addObserver(observerPassenger);
 
         TableRefresherObserver observerPlane = new TableRefresherObserver(() -> {
-            PlaneTableList.updatePlanesList((DefaultTableModel) ShowAllPlanes.getModel()); // planeTable → ShowAllPlanes ✅
+            PlaneTableList.updatePlanesList((DefaultTableModel) ShowAllPlanes.getModel()); 
         });
         planeRP.addObserver(observerPlane);
 
         TableRefresherObserver observerLocation = new TableRefresherObserver(() -> {
-            LocationTableList.updateLocationsList((DefaultTableModel) ShowAllLocations.getModel()); // locationTable → ShowAllLocations ✅
+            LocationTableList.updateLocationsList((DefaultTableModel) ShowAllLocations.getModel()); 
         });
         locationRP.addObserver(observerLocation);
 
         TableRefresherObserver observerFlight = new TableRefresherObserver(() -> {
-            FlightTableList.updateFlightsList((DefaultTableModel) ShowAllFlights.getModel()); // flightTable → ShowAllFlights ✅
+            FlightTableList.updateFlightsList((DefaultTableModel) ShowAllFlights.getModel()); 
         });
         flightRP.addObserver(observerFlight);
 
         TableRefresherObserver observerShowMyFlight = new TableRefresherObserver(() -> {
             PassengerFlightsTableList.updatePassengerFlightsList(
                     (DefaultTableModel) ShowMyFlights.getModel(),
-                    IdPassengerTx.getText() // idPassengerFlightText → IdPassengerTx ✅
+                    IdPassengerTx.getText() 
             );
         });
         flightRP.addObserver(observerShowMyFlight);
@@ -1608,13 +1610,12 @@ public class AirportFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_CreateLocationRegistrationActionPerformed
 
     private void CreateFlightRegistrationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CreateFlightRegistrationActionPerformed
-        // Obtener valores de los campos y combos usando las variables nuevas
         String vueloId = IdFLight.getText();
         String avionId = PlaneFlight.getItemAt(PlaneFlight.getSelectedIndex());
         String locSalidaId = DepartureLocationFlight.getItemAt(DepartureLocationFlight.getSelectedIndex());
         String locLlegadaId = ArrivalLocationFlight.getItemAt(ArrivalLocationFlight.getSelectedIndex());
         String locEscalaId = ScaleFlight.getItemAt(ScaleFlight.getSelectedIndex());
-        String anio = YearTx.getText();
+        String año = YearTx.getText();
         String mesSalida = MONTH1.getItemAt(MONTH1.getSelectedIndex());
         String diaSalida = DAY1.getItemAt(DAY1.getSelectedIndex());
         String horaSalida = HOUR1.getItemAt(HOUR1.getSelectedIndex());
@@ -1623,7 +1624,7 @@ public class AirportFrame extends javax.swing.JFrame {
         String minutosLlegada = MINUTE2.getItemAt(MINUTE2.getSelectedIndex());
         String horaEscala = HOURSdelay.getItemAt(HOURSdelay.getSelectedIndex());
         String minutosEscala = MINUTESdelay.getItemAt(MINUTESdelay.getSelectedIndex());
-        String fechaSalida = String.format("%s-%s-%s", anio, mesSalida, diaSalida);
+        String fechaSalida = String.format("%s-%s-%s", año, mesSalida, diaSalida);
         String horaSalidaCompleta = String.format("%s:%s", horaSalida, minutosSalida);
         FlightController controladorVuelos = new FlightController(flightRP, locationRP, planeRP);
         Response respuesta = controladorVuelos.createFlight(
@@ -1650,6 +1651,8 @@ public class AirportFrame extends javax.swing.JFrame {
             MINUTE2.setSelectedIndex(0);
             HOURSdelay.setSelectedIndex(0);
             MINUTESdelay.setSelectedIndex(0);
+            PlaneFlight.addItem(vueloId);
+            FlightAddToFrame.addItem(vueloId);
         }
 
     }//GEN-LAST:event_CreateFlightRegistrationActionPerformed
@@ -1745,8 +1748,6 @@ public class AirportFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, response.getMessage(), "Éxito", JOptionPane.INFORMATION_MESSAGE);
             DefaultTableModel model = (DefaultTableModel) ShowAllFlights.getModel();
             FlightTableList.updateFlightsList(model);
-
-            // Reset
             IDdelay.setSelectedIndex(0);
             HOURSdelay.setSelectedIndex(0);
             MINUTESdelay.setSelectedIndex(0);

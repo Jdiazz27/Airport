@@ -4,6 +4,10 @@
  */
 package core.data;
 
+import core.models.Flight;
+import core.models.Location;
+import core.models.Passenger;
+import core.models.Plane;
 import core.models.storage.AirportStorage;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -16,40 +20,27 @@ import javax.swing.JComboBox;
 public class ComboLoader {
 
     public static void loadPassengers(JComboBox<String> combo) {
-        loadIds(combo, AirportStorage.getInstance().getPassengerRepo().getAllPassengers());
+        for (Passenger p : AirportStorage.getInstance().getPassengerRepo().getAllPassengers()) {
+            combo.addItem(String.valueOf(p.getId()));
+        }
     }
 
     public static void loadPlanes(JComboBox<String> combo) {
-        loadIds(combo, AirportStorage.getInstance().getPlaneRepo().getAllPlanes());
+        for (Plane p : AirportStorage.getInstance().getPlaneRepo().getAllPlanes()) {
+            combo.addItem(String.valueOf(p.getId()));
+        }
     }
 
     public static void loadLocations(JComboBox<String> combo) {
-        loadIds(combo, AirportStorage.getInstance().getLocationRepository().getAllLocations());
+        for (Location l : AirportStorage.getInstance().getLocationRepository().getAllLocations()) {
+            combo.addItem(String.valueOf(l.getAirportId()));
+        }
     }
 
     public static void loadFlights(JComboBox<String> combo) {
-        loadIds(combo, AirportStorage.getInstance().getFlightRepository().getAllFlights());
-    }
-
-    private static <T> void loadIds(JComboBox<String> combo, List<T> items) { // Método genérico para poblar el combo con IDs
-        combo.removeAllItems(); // Limpia combo antes de cargar
-        for (T item : items) {
-            String id = extractId(item);
-            if (id != null) {
-                combo.addItem(id);
-            }
+        for (Flight f : AirportStorage.getInstance().getFlightRepository().getAllFlights()) {
+            combo.addItem(String.valueOf(f.getId()));
         }
     }
 
-    // Extrae el ID usando reflexión simple
-    private static String extractId(Object obj) {
-        try {
-            Method getIdMethod = obj.getClass().getMethod("getId");
-            Object id = getIdMethod.invoke(obj);
-            return id != null ? id.toString() : null;
-        } catch (Exception e) {
-            // Si no tiene getId o falla, ignora
-            return null;
-        }
-    }
 }
