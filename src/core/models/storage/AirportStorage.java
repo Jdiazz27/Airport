@@ -1,6 +1,6 @@
 package core.models.storage;
 
-import core.models.flight.Flight;
+import core.models.Flight;
 import core.models.Location;
 import core.models.Passenger;
 import core.models.Plane;
@@ -17,6 +17,7 @@ public class AirportStorage {
 
     //metodo singleton
     private static AirportStorage instance;
+
     public static AirportStorage getInstance() {
         if (instance == null) {
             instance = new AirportStorage();

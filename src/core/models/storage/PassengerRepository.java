@@ -1,4 +1,5 @@
 package core.models.storage;
+
 import core.models.Passenger;
 import core.models.Plane;
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ import java.util.List;
  *
  * @author jdiaz
  */
-public class PassengerRepository {
+public class PassengerRepository extends Observable {
 
     private List<Passenger> passengers = new ArrayList<>();
 
@@ -58,12 +59,24 @@ public class PassengerRepository {
         return sortedList;
     }
 
-    public Passenger findById(long id) {
+    public Passenger getPassengerRaw(long id) {
         for (Passenger p : passengers) {
             if (p.getId() == id) {
-                return p;
+                return p; // sin clonar
             }
         }
         return null;
     }
+
+    public boolean updatePassenger(Passenger updatedPassenger) {
+        for (int i = 0; i < passengers.size(); i++) {
+            if (passengers.get(i).getId() == updatedPassenger.getId()) {
+                passengers.set(i, updatedPassenger);
+                notifyObservers(); // Para el patrón observer
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

@@ -6,6 +6,7 @@ package core.controllers;
 
 import core.controllers.utils.Response;
 import core.controllers.utils.Status;
+import core.controllers.utils.LocationValidator;
 import core.models.Location;
 import core.models.storage.LocationRepository;
 
@@ -22,30 +23,31 @@ public class LocationController {
     }
 
     public Response createLocation(String id, String name, String city, String country, String latitude, String longitude) {
-        Response validation = LocationValidator.parseAndValidate(id, name, city, country, latitude, longitude, repository, false);
+        Response validation = LocationValidator.parseAndValidate(id, name, city, country, latitude, longitude, locationRepository, false);
 
         if (validation.getStatus() != Status.OK) {
             return validation;
         }
 
         Location location = (Location) validation.getObject();
-        repository.addLocation(location);
-        return new Response("SE ha registrado la ubicación.", Status.CREATED, location.clone());
+        locationRepository.addLocation(location);
+        return new Response("Se ha registrado la ubicación.", Status.CREATED, location.clone());
     }
 
     public Response getAllLocations() {
-        var list = repository.getAllLocations();
+        var list = locationRepository.getAllLocations();
         if (list.isEmpty()) {
-            return new Response("No hay ubicaciones registradas.", Status.NO_CONTENT());
+            return new Response("No hay ubicaciones registradas.", Status.NO_CONTENT);
         }
         return new Response("Se obtuvieron las ubicaciones de manera exitosa.", Status.OK, list);
     }
 
     public Response getLocationById(String id) {
-        Location location = repository.getLocation(id);
+        Location location = locationRepository.getLocation(id);
         if (location == null) {
-            return new Response("No se encontró la ubicación.", Status.NOT_FOUND());
+            return new Response("No se encontró la ubicación.", Status.NOT_FOUND);
         }
         return new Response("Se encontró la ubicación.", Status.OK, location);
-    } 
+    }
+
 }

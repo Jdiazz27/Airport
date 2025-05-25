@@ -4,16 +4,16 @@
  */
 package core.models;
 
-import core.models.flight.Flight;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import core.models.interfaces.Clone;
+import core.models.interfaces.HasFlights;
 
 /**
  *
  * @author edangulo
  */
-public class Passenger implements Clone<Passenger> {
+public class Passenger implements Clone<Passenger>, HasFlights {
 
     private final long id;
     private String firstname;
@@ -33,10 +33,6 @@ public class Passenger implements Clone<Passenger> {
         this.phone = phone;
         this.country = country;
         this.flights = new ArrayList<>();
-    }
-
-    public void addFlight(Flight flight) {
-        this.flights.add(flight);
     }
 
     public long getId() {
@@ -112,6 +108,11 @@ public class Passenger implements Clone<Passenger> {
 
         return copy;
 
+    }
+
+    @Override
+    public void addFlight(Flight flight) {
+        flights.add(flight);
     }
 
 }

@@ -4,73 +4,64 @@
  */
 package core.models.storage;
 
-import core.models.flight.Flight;
+import core.models.Flight;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
  * @author jdiaz
  */
-public class FlightRepository {
+public class FlightRepository extends Observable {
 
-    private List<Flight> flights = new ArrayList<>();
+    private final List<Flight> flights = new ArrayList<>();
 
     public boolean addFlight(Flight flight) {
-        for (Flight f : this.flights) {
-            if (f.getId().equals(flight.getId())) {
+        for (Flight f : flights) {
+            if (Objects.equals(f.getId(), flight.getId())) {
                 return false;
             }
         }
-        this.flights.add(flight);
+        flights.add(flight);
         return true;
     }
 
     public Flight getFlight(String id) {
         for (Flight f : flights) {
-            if (f.getId().equals(id)) {
-                return f.clone();
+            if (Objects.equals(f.getId(), id)) {
+                return f.clone(); // devuelve una copia
+            }
+        }
+        return null;
+    }
+
+    public Flight getFlightRaw(String id) {
+        for (Flight f : flights) {
+            if (Objects.equals(f.getId(), id)) {
+                return f; // devuelve el original
             }
         }
         return null;
     }
 
     public boolean delFlight(String id) {
-        for (Flight f : this.flights) {
-            if (f.getId().equals(id)) {
-                this.flights.remove(f);
-                return true;
-            }
-        }
-        return false;
+        return flights.removeIf(f -> Objects.equals(f.getId(), id));
     }
 
     public List<Flight> getAllFlights() {
         List<Flight> sortedList = new ArrayList<>();
-
         for (Flight f : flights) {
             sortedList.add(f.clone());
         }
 
-        Collections.sort(sortedList, new Comparator<Flight>() {
-            @Override
-            public int compare(Flight f1, Flight f2) {
-                return f1.getId().compareTo(f2.getId());
-            }
-        });
-
+        sortedList.sort(Comparator.comparing(Flight::getDepartureDate));
         return sortedList;
     }
 
     public Flight findById(String id) {
-        for (Flight f : flights) {
-            if (f.getId().equals(id)) {
-                return f;
-            }
-        }
-        return null;
+        return getFlightRaw(id);
     }
-
 }

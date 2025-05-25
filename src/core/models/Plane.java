@@ -1,14 +1,13 @@
 package core.models;
-
-import core.models.flight.Flight;
 import java.util.ArrayList;
 import core.models.interfaces.Clone;
+import core.models.interfaces.HasFlights;
 
 /**
  *
  * @author edangulo
  */
-public class Plane implements Clone<Plane> {
+public class Plane implements Clone<Plane>, HasFlights {
 
     private final String id;
     private String brand;
@@ -24,10 +23,6 @@ public class Plane implements Clone<Plane> {
         this.maxCapacity = maxCapacity;
         this.airline = airline;
         this.flights = new ArrayList<>();
-    }
-
-    public void addFlight(Flight flight) {
-        this.flights.add(flight);
     }
 
     public String getId() {
@@ -69,6 +64,11 @@ public class Plane implements Clone<Plane> {
         }
 
         return copy;
+    }
+    
+    @Override
+    public void addFlight(Flight flight) {
+        flights.add(flight);
     }
 
 }

@@ -10,7 +10,7 @@ import java.util.List;
  *
  * @author jdiaz
  */
-public class LocationRepository {
+public class LocationRepository extends Observable{
 
     private List<Location> locations = new ArrayList<>();
 

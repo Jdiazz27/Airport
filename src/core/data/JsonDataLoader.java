@@ -1,6 +1,6 @@
 package core.data;
 
-import core.models.flight.Flight;
+import core.models.Flight;
 import core.models.Location;
 import core.models.Passenger;
 import core.models.Plane;

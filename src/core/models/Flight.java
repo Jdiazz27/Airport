@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package core.models.flight;
+package core.models;
 
 import core.models.Location;
 import core.models.Passenger;
@@ -13,7 +13,7 @@ import core.models.interfaces.Clone;
 
 /**
  *
- * @author edangulo
+ * @author jdiaz
  */
 public class Flight implements Clone<Flight> {
 
@@ -64,6 +64,10 @@ public class Flight implements Clone<Flight> {
 
     public String getId() {
         return id;
+    }
+
+    public int getNumPassengers() {
+        return passengers.size();
     }
 
     public Location getDepartureLocation() {

@@ -14,7 +14,7 @@ import java.util.List;
  *
  * @author jdiaz
  */
-public class PlaneRepository {
+public class PlaneRepository extends Observable {
 
     private List<Plane> planes = new ArrayList<>();
 
