@@ -21,6 +21,7 @@ public class LocationRepository extends Observable{
             }
         }
         this.locations.add(location);
+        notifyObservers();
         return true;
     }
 

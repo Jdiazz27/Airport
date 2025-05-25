@@ -57,6 +57,9 @@ public class PassengerValidator {
         if (!isUpdate && repo.getPassenger(id) != null) {
             return badRequest("Ya existe un pasajero con ese ID.");
         }
+        if (isUpdate && repo.getPassenger(id) == null) {
+            return badRequest("El pasajero a actualizar no existe.");
+        }
 
         // Validación de fecha de nacimiento
         LocalDate birthDate;
@@ -105,5 +108,4 @@ public class PassengerValidator {
     private static Response badRequest(String message) {
         return new Response(message, Status.BAD_REQUEST);
     }
-
 }

@@ -47,9 +47,12 @@ public class LocationValidator {
             return badRequest("La longitud debe estar entre -180 y 180 y tener máximo 4 decimales.");
         }
 
-        // Validación de duplicado
+        // Validación de duplicado o existencia según modo
         if (!isUpdate && locationRepository.getLocation(id) != null) {
             return badRequest("Ya existe una ubicación con ese ID.");
+        }
+        if (isUpdate && locationRepository.getLocation(id) == null) {
+            return badRequest("La ubicación a actualizar no existe.");
         }
 
         // Creación y retorno
@@ -74,7 +77,7 @@ public class LocationValidator {
 
     private static boolean hasAtMostFourDecimals(String numberStr) {
         String[] parts = numberStr.split("\\.");
-        return parts.length == 1 || parts[1].length() <= 4;
+        return parts.length == 1 || parts[1].replaceAll("0+$", "").length() <= 4;
     }
 
     private static boolean isNullOrEmpty(String s) {

@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import core.models.interfaces.Clone;
 import core.models.interfaces.HasFlights;
+import java.time.Period;
 
 /**
  *
@@ -45,6 +46,22 @@ public class Passenger implements Clone<Passenger>, HasFlights {
 
     public String getLastname() {
         return lastname;
+    }
+
+    public String getFullname() {
+        return firstname + " " + lastname;
+    }
+
+    public int calculateAge() {
+        return Period.between(this.birthDate, LocalDate.now()).getYears();
+    }
+
+    public String generateFullPhone() {
+        return "+" + countryPhoneCode + " " + phone;
+    }
+
+    public int getNumFlights() {
+        return flights.size();
     }
 
     public LocalDate getBirthDate() {

@@ -147,4 +147,23 @@ public class Flight implements Clone<Flight> {
         return copy;
     }
 
+    public LocalDateTime calculateArrivalDate() {
+        LocalDateTime arrival;
+
+        if (scaleLocation != null) {
+            // Si hay escala, sumamos duración escala + duración llegada
+            arrival = departureDate
+                    .plusHours(hoursDurationScale)
+                    .plusMinutes(minutesDurationScale)
+                    .plusHours(hoursDurationArrival)
+                    .plusMinutes(minutesDurationArrival);
+        } else {
+            // Vuelo directo
+            arrival = departureDate
+                    .plusHours(hoursDurationArrival)
+                    .plusMinutes(minutesDurationArrival);
+        }
+        return arrival;
+    }
+
 }

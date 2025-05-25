@@ -4,10 +4,13 @@
  */
 package main;
 
+import com.formdev.flatlaf.FlatDarkLaf;
 import core.data.JsonDataLoader;
 import core.models.Flight;
 import core.models.Plane;
 import core.models.storage.AirportStorage;
+import core.view.AirportFrame;
+import javax.swing.UIManager;
 
 /**
  *
@@ -16,23 +19,28 @@ import core.models.storage.AirportStorage;
 public class Main {
 
     public static void main(String[] args) {
+        // Establecer estilo de interfaz
+        System.setProperty("flatlaf.useNativeLibrary", "false");
+        try {
+            UIManager.setLookAndFeel(new FlatDarkLaf());
+        } catch (Exception ex) {
+            System.err.println("Failed to initialize Look and Feel");
+        }
+        
         System.out.println("Iniciando carga de datos...\n");
-
-        // Cargar datos desde JSON
         JsonDataLoader loader = new JsonDataLoader();
         loader.loadAllData();
 
-        // Obtener el almacenamiento
         AirportStorage storage = AirportStorage.getInstance();
 
-        // Mostrar información de aviones cargados
+        // Mostrar información de aviones
         System.out.println(">>> Lista de aviones disponibles:");
         for (Plane p : storage.getPlaneRepo().getAllPlanes()) {
             System.out.printf("-> Avión %s (%s)\n", p.getId(), p.getBrand());
             System.out.println("   Total de vuelos asignados: " + p.getFlights().size());
         }
 
-        // Mostrar información de vuelos cargados
+        // Mostrar información de vuelos
         System.out.println("\n>>> Información de vuelos registrados:");
         for (Flight f : storage.getFlightRepository().getAllFlights()) {
             System.out.printf("-> Vuelo %s | Avión: %s\n", f.getId(), f.getPlane().getId());
@@ -41,6 +49,9 @@ public class Main {
                     f.getArrivalLocation().getAirportId()
             );
         }
+        java.awt.EventQueue.invokeLater(() -> {
+            new AirportFrame().setVisible(true);
+        });
     }
 
 }

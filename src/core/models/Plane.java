@@ -1,4 +1,5 @@
 package core.models;
+
 import java.util.ArrayList;
 import core.models.interfaces.Clone;
 import core.models.interfaces.HasFlights;
@@ -45,6 +46,10 @@ public class Plane implements Clone<Plane>, HasFlights {
         return airline;
     }
 
+    public int getNumFlights() {
+        return flights.size();
+    }
+
     public ArrayList<Flight> getFlights() {
         return flights;
     }
@@ -60,12 +65,12 @@ public class Plane implements Clone<Plane>, HasFlights {
         );
 
         for (Flight f : this.flights) {
-            copy.addFlight(f); 
+            copy.addFlight(f);
         }
 
         return copy;
     }
-    
+
     @Override
     public void addFlight(Flight flight) {
         flights.add(flight);

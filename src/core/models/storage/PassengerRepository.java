@@ -22,6 +22,7 @@ public class PassengerRepository extends Observable {
             }
         }
         this.passengers.add(passenger);
+        notifyObservers();
         return true;
     }
 

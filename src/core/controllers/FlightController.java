@@ -112,7 +112,7 @@ public class FlightController {
     }
 
     public Response getFlightById(String id) {
-        Flight flight = flightRepo.getFlight(id); // Usa el método que hace `.clone()`
+        Flight flight = flightRepo.getFlight(id);
         if (flight == null) {
             return new Response("Vuelo no encontrado.", Status.NOT_FOUND);
         }

@@ -16,7 +16,7 @@ public class PlaneController {
     public static Response registerPlane(String id, String brand, String model, String maxCapacity, String airline) {
         PlaneRepository repo = AirportStorage.getInstance().getPlaneRepo();
 
-        Response r = PlaneValidator.parseAndValidate(id, brand, model, maxCapacity, airline, repo);
+        Response r = PlaneValidator.parseAndValidate(id, brand, model, maxCapacity, airline, repo, false);
         if (r.getStatus() != Status.OK) {
             return r;
         }

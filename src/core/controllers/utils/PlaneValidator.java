@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public class PlaneValidator {
 
-    public static Response parseAndValidate(String id, String brand, String model, String maxCapacityStr, String airline, PlaneRepository repo) {
+    public static Response parseAndValidate(String id, String brand, String model, String maxCapacityStr, String airline, PlaneRepository repo, boolean isUpdate) {
         // Validar campos obligatorios
         Map<String, String> campos = Map.of(
                 "ID", id,
@@ -35,9 +35,12 @@ public class PlaneValidator {
             return new Response("El ID del avión debe tener el formato XXYYYYY (2 letras mayúsculas seguidas de 5 dígitos).", Status.BAD_REQUEST);
         }
 
-        // Validar unicidad del ID
-        if (repo.getPlane(id) != null) {
+        // Validar existencia o duplicación según si es update
+        if (!isUpdate && repo.getPlane(id) != null) {
             return new Response("Ya existe un avión con ese ID.", Status.BAD_REQUEST);
+        }
+        if (isUpdate && repo.getPlane(id) == null) {
+            return new Response("El avión a actualizar no existe.", Status.BAD_REQUEST);
         }
 
         // Validar capacidad

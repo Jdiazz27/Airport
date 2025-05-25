@@ -39,7 +39,7 @@ public class FlightValidator {
     }
 
     private static LocalDateTime parseDateTime(String dateStr, String timeStr) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-M-d'T'H:m");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-M-d'T'HH:mm");
         return LocalDateTime.parse(dateStr + "T" + timeStr, formatter);
     }
 
@@ -102,7 +102,8 @@ public class FlightValidator {
         LocalDateTime departureDateTime;
         try {
             departureDateTime = parseDateTime(departureDateStr, departureTimeStr);
-            if (departureDateTime.isBefore(LocalDateTime.now())) {
+            // Validación de fecha con tolerancia
+            if (departureDateTime.isBefore(LocalDateTime.now().minusMinutes(1))) {
                 return error("La fecha de salida debe ser futura o actual.");
             }
         } catch (DateTimeParseException e) {
@@ -117,7 +118,8 @@ public class FlightValidator {
         int minutesArrival = Integer.parseInt(minutesArrivalStr);
 
         // Escala
-        boolean hasScale = !isNullOrEmpty(scaleLocationId);
+        boolean hasScale = !isNullOrEmpty(scaleLocationId)
+                && !scaleLocationId.equalsIgnoreCase("NO");
         Location scale = null;
         int hoursScale = 0, minutesScale = 0;
 
@@ -131,11 +133,18 @@ public class FlightValidator {
                 return error("La ubicación de escala no existe.");
             }
 
+            if (isNullOrEmpty(hoursScaleStr) || isNullOrEmpty(minutesScaleStr)) {
+                return error("Debe especificar la duración de la escala.");
+            }
+
             if (!isValidDuration(hoursScaleStr, minutesScaleStr)) {
                 return error("Duración de escala inválida.");
             }
             hoursScale = Integer.parseInt(hoursScaleStr);
             minutesScale = Integer.parseInt(minutesScaleStr);
+        } else {
+            hoursScale = 0;
+            minutesScale = 0;
         }
 
         Flight flight = hasScale

@@ -25,6 +25,7 @@ public class PlaneRepository extends Observable {
             }
         }
         this.planes.add(plane);
+        notifyObservers();
         return true;
     }
 
