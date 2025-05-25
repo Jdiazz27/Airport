@@ -55,7 +55,7 @@ public class JsonDataLoader {
 
     private void loadPlanes() {
         try {
-            FileReader reader = new FileReader("C:/Users/jdiaz/OneDrive/Escritorio/III/POO/Airport/json/planes.json");
+            FileReader reader = new FileReader("json/planes.json");
             JSONArray array = new JSONArray(new JSONTokener(reader));
 
             for (int i = 0; i < array.length(); i++) {
@@ -78,7 +78,7 @@ public class JsonDataLoader {
 
     private void loadPassengers() {
         try {
-            FileReader reader = new FileReader("C:/Users/jdiaz/OneDrive/Escritorio/III/POO/Airport/json/passengers.json");
+            FileReader reader = new FileReader("json/passengers.json");
             JSONArray array = new JSONArray(new JSONTokener(reader));
 
             for (int i = 0; i < array.length(); i++) {
@@ -103,7 +103,7 @@ public class JsonDataLoader {
 
     private void loadFlights() {
         try {
-            FileReader reader = new FileReader("C:/Users/jdiaz/OneDrive/Escritorio/III/POO/Airport/json/flights.json");
+            FileReader reader = new FileReader("json/flights.json");
             JSONArray array = new JSONArray(new JSONTokener(reader));
 
             for (int i = 0; i < array.length(); i++) {
