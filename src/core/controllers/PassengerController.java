@@ -9,10 +9,7 @@ import core.controllers.utils.Response;
 import core.controllers.utils.Status;
 import core.models.Flight;
 import core.models.Passenger;
-import core.models.storage.AirportStorage;
-import core.models.storage.FlightRepository;
 import core.models.storage.PassengerRepository;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 

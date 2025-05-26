@@ -36,6 +36,18 @@ public class LocationValidator {
             return badRequest("El país no puede estar vacío.");
         }
 
+        if (!name.matches("[\\p{L} ]+")) {
+            return new Response("El nombre del aeropuerto solo puede contener letras.", Status.BAD_REQUEST);
+        }
+
+        if (!city.matches("[\\p{L} ]+")) {
+            return new Response("El nombre de la ciudad solo puede contener letras.", Status.BAD_REQUEST);
+        }
+
+        if (!country.matches("[\\p{L} ]+")) {
+            return new Response("El nombre del país solo puede contener letras.", Status.BAD_REQUEST);
+        }
+
         // Validación de coordenadas
         double latitude = validateCoordinate(latStr, -90, 90);
         if (Double.isNaN(latitude)) {

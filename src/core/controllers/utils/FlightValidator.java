@@ -20,167 +20,159 @@ import java.time.format.DateTimeParseException;
  */
 public class FlightValidator {
 
-    private static boolean isNullOrEmpty(String s) {
-        return s == null || s.trim().isEmpty();
-    }
-
-    private static boolean isValidId(String id) {
-        return id.matches("[A-Z]{3}\\d{3}");
-    }
-
-    private static boolean isValidDuration(String hStr, String mStr) {
-        try {
-            int h = Integer.parseInt(hStr);
-            int m = Integer.parseInt(mStr);
-            return h >= 0 && m >= 0 && m < 60 && (h > 0 || m > 0);
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
-    private static LocalDateTime parseDateTime(String dateStr, String timeStr) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-M-d'T'HH:mm");
-        return LocalDateTime.parse(dateStr + "T" + timeStr, formatter);
-    }
-
     public static Response parseAndValidate(
-            String id,
-            String departureLocationId,
-            String arrivalLocationId,
-            String departureDateStr,
-            String departureTimeStr,
+            String flightId,
+            String originId,
+            String destinationId,
+            String dateStr,
+            String timeStr,
             String hoursArrivalStr,
             String minutesArrivalStr,
             String planeId,
             String scaleLocationId,
             String hoursScaleStr,
             String minutesScaleStr,
-            FlightRepository flightRepo,
-            LocationRepository locationRepo,
-            PlaneRepository planeRepo,
-            boolean isUpdate
-    ) {
-        // ID
-        if (isNullOrEmpty(id)) {
-            return error("El ID no puede estar vacío.");
+            FlightRepository flightRepository,
+            LocationRepository locationRepository,
+            PlaneRepository planeRepository,
+            boolean createMode) {
+
+        // Validar ID
+        if (isNullOrEmpty(flightId)) {
+            return new Response("ID del vuelo es obligatorio.", Status.BAD_REQUEST);
         }
-        if (!isValidId(id)) {
-            return error("El ID debe tener el formato XXX123.");
+        if (!flightId.matches("[A-Z]{3}\\d{3}")) {
+            return new Response("Formato de ID inválido: 3 letras y 3 dígitos.", Status.BAD_REQUEST);
         }
-        if (!isUpdate && flightRepo.getFlight(id) != null) {
-            return error("Ya existe un vuelo con ese ID.");
+        if (!createMode && flightRepository.getFlight(flightId) != null) {
+            return new Response("El vuelo con ese ID ya existe.", Status.BAD_REQUEST);
         }
 
-        // Ubicaciones
-        if (isNullOrEmpty(departureLocationId) || isNullOrEmpty(arrivalLocationId)) {
-            return error("La ubicación de salida y llegada no pueden estar vacías.");
+        // Validar origen y destino
+        if (isNullOrEmpty(originId) || isNullOrEmpty(destinationId)) {
+            return new Response("Origen y destino no pueden estar vacíos.", Status.BAD_REQUEST);
         }
-        if (departureLocationId.equals(arrivalLocationId)) {
-            return error("La ubicación de salida y llegada no pueden ser iguales.");
-        }
-
-        Location departure = locationRepo.getLocation(departureLocationId);
-        Location arrival = locationRepo.getLocation(arrivalLocationId);
-        if (departure == null) {
-            return error("La ubicación de salida no existe.");
-        }
-        if (arrival == null) {
-            return error("La ubicación de llegada no existe.");
+        if (originId.equals(destinationId)) {
+            return new Response("Origen y destino deben ser distintos.", Status.BAD_REQUEST);
         }
 
-        // Avión
-        Plane plane = planeRepo.getPlane(planeId);
+        Location origin = locationRepository.getLocation(originId);
+        if (origin == null) {
+            return new Response("Ubicación de origen no encontrada.", Status.BAD_REQUEST);
+        }
+        Location destination = locationRepository.getLocation(destinationId);
+        if (destination == null) {
+            return new Response("Ubicación de destino no encontrada.", Status.BAD_REQUEST);
+        }
+
+        // Validar avión
+        Plane plane = planeRepository.getPlane(planeId);
         if (plane == null) {
-            return error("El avión no existe.");
+            return new Response("Avión no registrado.", Status.BAD_REQUEST);
         }
 
-        // Fecha y hora
-        if (isNullOrEmpty(departureDateStr) || isNullOrEmpty(departureTimeStr)) {
-            return error("La fecha y la hora de salida no pueden estar vacías.");
+        // Validar fecha y hora de salida
+        if (isNullOrEmpty(dateStr) || isNullOrEmpty(timeStr)) {
+            return new Response("Debe indicar fecha y hora de salida.", Status.BAD_REQUEST);
         }
-
         LocalDateTime departureDateTime;
         try {
-            departureDateTime = parseDateTime(departureDateStr, departureTimeStr);
-            // Validación de fecha con tolerancia
-            if (departureDateTime.isBefore(LocalDateTime.now().minusMinutes(1))) {
-                return error("La fecha de salida debe ser futura o actual.");
+            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-M-d'T'H:m");
+            departureDateTime = LocalDateTime.parse(dateStr + "T" + timeStr, fmt);
+            if (departureDateTime.isBefore(LocalDateTime.now())) {
+                return new Response("La salida debe ser futura o actual.", Status.BAD_REQUEST);
             }
-        } catch (DateTimeParseException e) {
-            return error("Formato de fecha u hora inválido. Usa YYYY-MM-DD y HH:mm.");
+        } catch (DateTimeParseException ex) {
+            return new Response("Formato de fecha u hora erróneo. Usa YYYY-MM-DD y HH:mm.", Status.BAD_REQUEST);
         }
 
-        // Duración llegada
-        if (!isValidDuration(hoursArrivalStr, minutesArrivalStr)) {
-            return error("Duración de llegada inválida.");
+        // Validar duración hacia destino
+        int hArr, mArr;
+        try {
+            hArr = Integer.parseInt(hoursArrivalStr);
+            mArr = Integer.parseInt(minutesArrivalStr);
+            if (hArr < 0 || mArr < 0 || mArr > 59) {
+                return new Response("Duración hacia destino inválida.", Status.BAD_REQUEST);
+            }
+            if (hArr == 0 && mArr == 0) {
+                return new Response("Duración del vuelo no puede ser cero.", Status.BAD_REQUEST);
+            }
+        } catch (NumberFormatException ne) {
+            return new Response("Duración del vuelo debe ser numérica.", Status.BAD_REQUEST);
         }
-        int hoursArrival = Integer.parseInt(hoursArrivalStr);
-        int minutesArrival = Integer.parseInt(minutesArrivalStr);
 
-        // Escala
-        boolean hasScale = !isNullOrEmpty(scaleLocationId)
-                && !scaleLocationId.equalsIgnoreCase("NO");
+        // Validar escala si aplica
+        boolean hasScale = !isNullOrEmpty(scaleLocationId) && !scaleLocationId.equalsIgnoreCase("None");
         Location scale = null;
-        int hoursScale = 0, minutesScale = 0;
-
+        int hScale = 0, mScale = 0;
         if (hasScale) {
-            if (scaleLocationId.equals(departureLocationId) || scaleLocationId.equals(arrivalLocationId)) {
-                return error("La escala no puede ser igual a la salida o llegada.");
+            if (scaleLocationId.equals(originId) || scaleLocationId.equals(destinationId)) {
+                return new Response("La escala no puede coincidir con origen o destino.", Status.BAD_REQUEST);
             }
-
-            scale = locationRepo.getLocation(scaleLocationId);
+            scale = locationRepository.getLocation(scaleLocationId);
             if (scale == null) {
-                return error("La ubicación de escala no existe.");
+                return new Response("Ubicación de escala no válida.", Status.BAD_REQUEST);
             }
-
-            if (isNullOrEmpty(hoursScaleStr) || isNullOrEmpty(minutesScaleStr)) {
-                return error("Debe especificar la duración de la escala.");
+            try {
+                hScale = Integer.parseInt(hoursScaleStr);
+                mScale = Integer.parseInt(minutesScaleStr);
+                if (hScale < 0 || mScale < 0 || mScale > 59) {
+                    return new Response("Duración de escala inválida.", Status.BAD_REQUEST);
+                }
+                if (hScale == 0 && mScale == 0) {
+                    return new Response("La escala debe tener duración mayor a cero.", Status.BAD_REQUEST);
+                }
+            } catch (NumberFormatException ne) {
+                return new Response("Duración de escala debe ser valores numéricos.", Status.BAD_REQUEST);
             }
-
-            if (!isValidDuration(hoursScaleStr, minutesScaleStr)) {
-                return error("Duración de escala inválida.");
-            }
-            hoursScale = Integer.parseInt(hoursScaleStr);
-            minutesScale = Integer.parseInt(minutesScaleStr);
         } else {
-            hoursScale = 0;
-            minutesScale = 0;
+            if (!isNullOrEmpty(hoursScaleStr) || !isNullOrEmpty(minutesScaleStr)) {
+                try {
+                    hScale = Integer.parseInt(hoursScaleStr);
+                    mScale = Integer.parseInt(minutesScaleStr);
+                    if (hScale != 0 || mScale != 0) {
+                        return new Response("Sin escala, horas y minutos deben ser 0.", Status.BAD_REQUEST);
+                    }
+                } catch (NumberFormatException ne) {
+                    return new Response("Sin escala, valores deben ser cero.", Status.BAD_REQUEST);
+                }
+            }
         }
 
+        // Construir el vuelo
         Flight flight = hasScale
-                ? new Flight(id, plane, departure, scale, arrival, departureDateTime, hoursArrival, minutesArrival, hoursScale, minutesScale)
-                : new Flight(id, plane, departure, arrival, departureDateTime, hoursArrival, minutesArrival);
+                ? new Flight(flightId, plane, origin, scale, destination, departureDateTime, hArr, mArr, hScale, mScale)
+                : new Flight(flightId, plane, origin, destination, departureDateTime, hArr, mArr);
 
-        return new Response("Validación exitosa.", Status.OK, flight);
+        return new Response("Vuelo validado con éxito.", Status.OK, flight);
     }
 
-    public static Response validateDelay(String flightId, String hoursStr, String minutesStr, FlightRepository repo) {
+    public static Response applyDelay(String flightId, String delayHours, String delayMinutes, FlightRepository repo) {
         if (isNullOrEmpty(flightId)) {
-            return error("El ID del vuelo no puede estar vacío.");
+            return new Response("ID de vuelo requerido para retraso.", Status.BAD_REQUEST);
         }
-
         Flight flight = repo.getFlight(flightId);
         if (flight == null) {
-            return new Response("El vuelo no existe.", Status.NOT_FOUND);
+            return new Response("No existe el vuelo para retrasar.", Status.NOT_FOUND);
         }
-
+        int dh, dm;
         try {
-            int hours = Integer.parseInt(hoursStr);
-            int minutes = Integer.parseInt(minutesStr);
-
-            if (hours < 0 || minutes < 0 || minutes > 59 || (hours == 0 && minutes == 0)) {
-                return error("Horas o minutos inválidos.");
+            dh = Integer.parseInt(delayHours);
+            dm = Integer.parseInt(delayMinutes);
+            if (dh < 0 || dm < 0 || dm > 59) {
+                return new Response("Valores de retraso inválidos.", Status.BAD_REQUEST);
             }
-
-            flight.setDepartureDate(flight.getDepartureDate().plusHours(hours).plusMinutes(minutes));
-            return new Response("Vuelo retrasado correctamente.", Status.OK, flight.clone());
-
-        } catch (NumberFormatException e) {
-            return error("Las horas y minutos deben ser numéricos.");
+            if (dh == 0 && dm == 0) {
+                return new Response("El retraso debe ser mayor que cero.", Status.BAD_REQUEST);
+            }
+        } catch (NumberFormatException ne) {
+            return new Response("Retraso debe ser numérico.", Status.BAD_REQUEST);
         }
+        flight.setDepartureDate(flight.getDepartureDate().plusHours(dh).plusMinutes(dm));
+        return new Response("Retraso aplicado correctamente.", Status.OK, flight.clone());
     }
 
-    private static Response error(String msg) {
-        return new Response(msg, Status.BAD_REQUEST);
+    private static boolean isNullOrEmpty(String str) {
+        return str == null || str.trim().isEmpty();
     }
 }

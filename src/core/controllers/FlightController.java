@@ -10,7 +10,7 @@ import core.models.storage.FlightRepository;
 import core.models.storage.LocationRepository;
 import core.models.storage.PassengerRepository;
 import core.models.storage.PlaneRepository;
-import java.util.Objects;
+import java.time.LocalDateTime;
 
 /**
  *
@@ -63,56 +63,69 @@ public class FlightController {
     }
 
     public Response addPassengerToFlight(long passengerId, String flightId) {
-        PassengerRepository passengerRepo = AirportStorage.getInstance().getPassengerRepo();
-        Passenger passenger = passengerRepo.getPassengerRaw(passengerId);
+        PassengerRepository passengerRepository = AirportStorage.getInstance().getPassengerRepo();
+        Passenger passenger = passengerRepository.getPassengerRaw(passengerId);
 
         if (passenger == null) {
-            return new Response("Pasajero no encontrado.", Status.NOT_FOUND);
+            return new Response("No se encontró el pasajero.", Status.NOT_FOUND);
         }
 
         Flight flight = flightRepo.getFlightRaw(flightId);
         if (flight == null) {
-            return new Response("Vuelo no encontrado.", Status.NOT_FOUND);
+            return new Response("No se encontró el vuelo.", Status.NOT_FOUND);
         }
 
-        boolean yaTieneVuelo = passenger.getFlights().stream()
-                .anyMatch(f -> Objects.equals(f.getId(), flightId));
-
-        if (yaTieneVuelo) {
-            return new Response("Este pasajero ya está registrado en ese vuelo.", Status.BAD_REQUEST);
+        // Verificar si el pasajero ya está en el vuelo
+        for (Flight f : passenger.getFlights()) {
+            if (f.getId().equals(flightId)) {
+                return new Response("El pasajero ya está asignado a este vuelo.", Status.BAD_REQUEST);
+            }
         }
 
+        // Agregar vuelo al pasajero y pasajero al vuelo
         passenger.addFlight(flight);
         flight.addPassenger(passenger);
 
-        passengerRepo.notifyObservers();
+        passengerRepository.notifyObservers();
         flightRepo.notifyObservers();
 
-        return new Response("Pasajero añadido correctamente al vuelo.", Status.OK);
+        return new Response("Pasajero agregado al vuelo exitosamente.", Status.OK);
     }
 
+
     public Response delayFlight(String flightId, String hoursStr, String minutesStr) {
-        Response validation = FlightValidator.validateDelay(flightId, hoursStr, minutesStr, flightRepo);
+        Response validation = FlightValidator.applyDelay(flightId, hoursStr, minutesStr, flightRepo);
         if (validation.getStatus() != Status.OK) {
             return validation;
         }
 
-        int hours = Integer.parseInt(hoursStr);
-        int minutes = Integer.parseInt(minutesStr);
+        int delayHours;
+        int delayMinutes;
+        try {
+            delayHours = Integer.parseInt(hoursStr);
+            delayMinutes = Integer.parseInt(minutesStr);
+        } catch (NumberFormatException e) {
+            return new Response("Las horas y minutos deben ser valores numéricos válidos.", Status.BAD_REQUEST);
+        }
 
         Flight flight = flightRepo.getFlightRaw(flightId);
         if (flight == null) {
-            return new Response("Vuelo no encontrado para retrasar.", Status.NOT_FOUND);
+            return new Response("No se encontró el vuelo para aplicar retraso.", Status.NOT_FOUND);
         }
 
-        flight.setDepartureDate(flight.getDepartureDate().plusHours(hours).plusMinutes(minutes));
+        LocalDateTime updatedDeparture = flight.getDepartureDate()
+            .plusHours(delayHours)
+            .plusMinutes(delayMinutes);
+
+        flight.setDepartureDate(updatedDeparture);
 
         flightRepo.notifyObservers();
-        return new Response("Vuelo retrasado correctamente.", Status.OK, flight.clone());
+
+        return new Response("Retraso aplicado con éxito al vuelo.", Status.OK, flight.clone());
     }
 
     public Response getFlightById(String id) {
-        Flight flight = flightRepo.getFlight(id);
+        Flight flight = flightRepo.getFlightRaw(id);
         if (flight == null) {
             return new Response("Vuelo no encontrado.", Status.NOT_FOUND);
         }

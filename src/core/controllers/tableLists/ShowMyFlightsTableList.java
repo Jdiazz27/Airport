@@ -17,9 +17,9 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author jdiaz
  */
-public class PassengerFlightsTableList {
+public class ShowMyFlightsTableList {
 
-    public static Response updatePassengerFlightsList(DefaultTableModel model, String passengerId) {
+    public static Response updateShowMyFlights(DefaultTableModel model, String passengerId) {
         try {
             model.setRowCount(0); // Limpia la tabla antes de llenarla
 

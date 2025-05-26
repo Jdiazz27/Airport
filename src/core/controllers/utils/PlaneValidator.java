@@ -35,6 +35,21 @@ public class PlaneValidator {
             return new Response("El ID del avión debe tener el formato XXYYYYY (2 letras mayúsculas seguidas de 5 dígitos).", Status.BAD_REQUEST);
         }
 
+        //Validar marca
+        if (!brand.matches("[\\p{L} ]+")) {
+            return new Response("El nombre de la marca solo puede contener letras.", Status.BAD_REQUEST);
+        }
+
+        //Validar Modelo
+        if (!model.matches("[\\p{L} ]+")) {
+            return new Response("El nombre del modelo solo puede contener letras.", Status.BAD_REQUEST);
+        }
+
+        //Validar Airline
+        if (!airline.matches("[\\p{L} ]+")) {
+            return new Response("El nombre de la aerolínea solo puede contener letras.", Status.BAD_REQUEST);
+        }
+
         // Validar existencia o duplicación según si es update
         if (!isUpdate && repo.getPlane(id) != null) {
             return new Response("Ya existe un avión con ese ID.", Status.BAD_REQUEST);

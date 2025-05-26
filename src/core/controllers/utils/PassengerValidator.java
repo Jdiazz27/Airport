@@ -16,30 +16,30 @@ import java.time.format.DateTimeParseException;
  */
 public class PassengerValidator {
 
-    public static Response parseAndValidate(String idStr, String firstname, String lastname,
-            String birthStr, String phoneCodeStr, String phoneStr,
-            String country, PassengerRepository repo, boolean isUpdate) {
+    public static Response parseAndValidate(String idStr, String nombre, String apellido,
+            String cumpleStr, String telefonoCodeStr, String telefonoStr,
+            String pais, PassengerRepository repo, boolean isUpdate) {
 
         // Validación de campos obligatorios
         if (isNullOrEmpty(idStr)) {
             return badRequest("El ID no puede estar vacío.");
         }
-        if (isNullOrEmpty(firstname)) {
+        if (isNullOrEmpty(nombre)) {
             return badRequest("El nombre no puede estar vacío.");
         }
-        if (isNullOrEmpty(lastname)) {
+        if (isNullOrEmpty(apellido)) {
             return badRequest("El apellido no puede estar vacío.");
         }
-        if (isNullOrEmpty(birthStr)) {
+        if (isNullOrEmpty(cumpleStr)) {
             return badRequest("La fecha de nacimiento no puede estar vacía.");
         }
-        if (isNullOrEmpty(phoneCodeStr)) {
+        if (isNullOrEmpty(telefonoCodeStr)) {
             return badRequest("El código de país no puede estar vacío.");
         }
-        if (isNullOrEmpty(phoneStr)) {
+        if (isNullOrEmpty(telefonoStr)) {
             return badRequest("El número de teléfono no puede estar vacío.");
         }
-        if (isNullOrEmpty(country)) {
+        if (isNullOrEmpty(pais)) {
             return badRequest("El país no puede estar vacío.");
         }
 
@@ -61,23 +61,35 @@ public class PassengerValidator {
             return badRequest("El pasajero a actualizar no existe.");
         }
 
+        //Validar nombre
+        if (!nombre.matches("[\\p{L} ]+")) {
+            return new Response("El nombre debe contener solo letras.", Status.BAD_REQUEST);
+        }
+
+        //Validar apellido
+        if (!apellido.matches("[\\p{L} ]+")) {
+            return new Response("El apellido debe contener solo letras.", Status.BAD_REQUEST);
+        }
+
+        //Validar pais
+        if (!pais.matches("[\\p{L} ]+")) {
+            return new Response("El país debe contener solo letras.", Status.BAD_REQUEST);
+        }
+
         // Validación de fecha de nacimiento
-        LocalDate birthDate;
+        LocalDate cumple;
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-M-d");
-            birthDate = LocalDate.parse(birthStr, formatter);
-            if (birthDate.isAfter(LocalDate.now())) {
-                return badRequest("La fecha de nacimiento no puede estar en el futuro.");
-            }
+            cumple = LocalDate.parse(cumpleStr, formatter);
         } catch (DateTimeParseException e) {
-            return badRequest("La fecha de nacimiento es inválida. Formato esperado: YYYY-M-D.");
+            return new Response("La fecha de nacimiento es inválida. Formato esperado: YYYY-MM-DD. Debe ser númerico.", Status.BAD_REQUEST);
         }
 
         // Validación de código de país
-        int phoneCode;
+        int celCode;
         try {
-            phoneCode = Integer.parseInt(phoneCodeStr);
-            if (phoneCode < 0 || phoneCodeStr.length() > 3) {
+            celCode = Integer.parseInt(telefonoCodeStr);
+            if (celCode < 0 || telefonoCodeStr.length() > 3) {
                 return badRequest("El código de país debe ser ≥ 0 y tener máximo 3 dígitos.");
             }
         } catch (NumberFormatException e) {
@@ -85,10 +97,10 @@ public class PassengerValidator {
         }
 
         // Validación de número de teléfono
-        long phone;
+        long cel;
         try {
-            phone = Long.parseLong(phoneStr);
-            if (phone < 0 || phoneStr.length() > 11) {
+            cel = Long.parseLong(telefonoStr);
+            if (cel < 0 || telefonoStr.length() > 11) {
                 return badRequest("El teléfono debe ser ≥ 0 y tener máximo 11 dígitos.");
             }
         } catch (NumberFormatException e) {
@@ -96,11 +108,10 @@ public class PassengerValidator {
         }
 
         // Crear objeto si todo es válido
-        Passenger passenger = new Passenger(id, firstname, lastname, birthDate, phoneCode, phone, country);
+        Passenger passenger = new Passenger(id, nombre, apellido, cumple, celCode, cel, pais);
         return new Response("Validación exitosa.", Status.OK, passenger);
     }
 
-// Métodos auxiliares
     private static boolean isNullOrEmpty(String s) {
         return s == null || s.trim().isEmpty();
     }

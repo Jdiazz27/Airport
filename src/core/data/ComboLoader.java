@@ -9,8 +9,6 @@ import core.models.Location;
 import core.models.Passenger;
 import core.models.Plane;
 import core.models.storage.AirportStorage;
-import java.lang.reflect.Method;
-import java.util.List;
 import javax.swing.JComboBox;
 
 /**
