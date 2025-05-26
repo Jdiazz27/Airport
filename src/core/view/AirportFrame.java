@@ -1797,7 +1797,7 @@ public class AirportFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_RefreshShowAllFlightsActionPerformed
 
     private void RefreshAllPlanesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RefreshAllPlanesActionPerformed
-        Response r = FlightTableList.updateFlightsList((DefaultTableModel) ShowAllPlanes.getModel());
+        Response r = PlaneTableList.updatePlanesList((DefaultTableModel) ShowAllPlanes.getModel());
 
         if (r.getStatus() >= 500) {
             JOptionPane.showMessageDialog(this, r.getMessage(), "Error " + r.getStatus(), JOptionPane.ERROR_MESSAGE);
